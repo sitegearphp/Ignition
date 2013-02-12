@@ -18,6 +18,7 @@ To create a skeleton website with the necessary boilerplate to start working in 
 
  1. Start in an empty directory where your website will be created:
 
+        cd /path/to/webroot  # e.g. cd /var/www
         mkdir mywebsite.com
         cd mywebsite.com
 
