@@ -28,7 +28,9 @@ To create a skeleton website with the necessary boilerplate to start working in 
 
  3. Answer the questions when prompted.
 
- 4. Watch as the relevant magic is applied and you will have a site skeleton ready to built on.
+ 4. Watch as the relevant magic is applied.
+
+ 5. Visit the site in a web browser (e.g. `http://localhost/mywebsite.com/`).
 
 ## Why is this not on Packagist?
 
