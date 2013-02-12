@@ -4,6 +4,8 @@ The ignition package is used to generate the necessary boilerplate for a Sitegea
 
 This is a "turn-key" solution for creating a website using Sitegear (pun intended).
 
+**NOTE** This is a work in progress.  At the moment you should expect _nothing_ to work!
+
 ## Distribution
 
 In general the "master" script at http://sitegear.org/ignition/resources/ignition.php should be used.
