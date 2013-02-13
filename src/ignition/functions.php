@@ -18,13 +18,14 @@
  * @throws RuntimeException
  */
 function askQuestions(array $questions, array &$structure, array &$data) {
+	$values = array();
 	foreach ($questions as $question) {
 		$askQuestion = true;
 		while ($askQuestion) {
 			// Write the question, get a valid answer, and handle that answer.
 			writeQuestionText($question);
 			$answer = askUntilValidAnswer($question);
-			handleAnswer($question, $answer, $structure, $data);
+			handleAnswer($question, $answer, $data, $values);
 
 			// Process dependent questions.
 			if ($answer && isset($question['dependents']) && is_array($question['dependents'])) {
@@ -107,17 +108,79 @@ function getHint(array $question) {
 }
 
 /**
+ * Perform token replacements on the given text value, using the `$values` map for tokens.  Any token in the text like
+ * `%token%` where "token" is any key in the `$values` array will be replaced by the corresponding value from the
+ * `$values` array.  Tokens with no matching key in `$values` will not be replaced.
+ *
+ * @param string $text
+ * @param array $values
+ *
+ * @return mixed
+ */
+function performTokenReplacements($text, array $values) {
+	foreach ($values as $key => $value) {
+		$text = preg_replace(sprintf('/%%%s%%/', $key), $value, $text);
+	}
+	return $text;
+}
+
+/**
  * Handle the given answer to the given question, potentially by updating the given data arrays.
  *
  * @param array $question
  * @param string|boolean $answer
- * @param array $structure
  * @param array $data
+ * @param array $values
+ *
+ * @throws RuntimeException
  */
-function handleAnswer(array $question, $answer, array &$structure, array &$data) {
+function handleAnswer(array $question, $answer, array &$data, array &$values) {
 	// Handle the answer given.
 	output(sprintf('Answered %s', is_string($answer) ? $answer : ($answer ? 'true' : 'false')));
-	// TODO
+	$positive = is_string($answer) ? (strlen($answer) > 0) : $answer === true;
+	if ($positive && isset($question['actions']) && is_array($question['actions'])) {
+		foreach ($question['actions'] as $action) {
+			$name = $action['name'];
+			switch ($action['type']) {
+				case 'data':
+					if (isset($action['key'])) {
+						$key = performTokenReplacements($action['key'], $values);
+						$answer = performTokenReplacements($answer, $values);
+						$dataForKey = buildDataForKey($key, $answer, $values);
+					} else {
+						$dataForKey = array( $answer );
+					}
+					$data[$name] = array_merge($data[$name], $dataForKey);
+					break;
+				case 'store':
+					$values[$name] = $answer;
+					break;
+				default:
+					throw new RuntimeException(sprintf('Unknown action type "%s" found for question "%s"', $action['type'], $question['question']));
+			}
+		}
+	}
+}
+
+/**
+ * Create a nested data array representing only the given value at the given key.  That is, if `$key` is `'a.b.c.d'`
+ * and `$value` is `'foo'`, the result will be: `array( 'a' => array( 'b' => array( 'c' => array( 'd' => 'foo' ))))`
+ *
+ * @param array|string $key
+ * @param string $value
+ *
+ * @return array
+ */
+function buildDataForKey($key, $value) {
+	if (is_string($key)) {
+		$key = explode('.', $key);
+	}
+	if (empty($key)) {
+		return $value;
+	} else {
+		$k = array_shift($key);
+		return array( $k => buildDataForKey($key, $value) );
+	}
 }
 
 /**
@@ -163,7 +226,8 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
 				}
 				break;
 			case 'json':
-				if (file_put_contents($path, json_encode($data[$name])) === false) {
+				$jsonOptions = defined('JSON_PRETTY_PRINT') && defined('JSON_UNESCAPED_SLASHES') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0;
+				if (file_put_contents($path, json_encode($data[$name], $jsonOptions)) === false) {
 					throw new RuntimeException(sprintf('Could not create JSON file "%s" from data at key "%s"', $path, $name));
 				}
 				break;
