@@ -16,8 +16,19 @@
  */
 function askQuestions(array $questions, array &$structure, array &$data) {
 	foreach ($questions as $question) {
-		$answer = readline(sprintf('%s [%s]: ', $question['question'], $question['type']));
-		echo sprintf('Answered %s', $answer), PHP_EOL;
+		output(PHP_EOL . $question['question'], 'success');
+		if (isset($question['notes'])) {
+			output(implode(PHP_EOL, $question['notes']), 'info');
+		}
+		$hint = isset($question['default']) ? 'default = ' . $question['default'] : 'required';
+		$answer = '';
+		while (strlen($answer) === 0) {
+			$answer = readline(sprintf('Please give your answer (%s): ', $hint));
+			if (strlen($answer) === 0 && isset($question['default'])) {
+				$answer = $question['default'];
+			}
+		}
+		output(sprintf('Answered %s', $answer), 'success');
 	}
 }
 
@@ -43,10 +54,11 @@ function askQuestions(array $questions, array &$structure, array &$data) {
  */
 function buildStructure(array $structure, array $data, $root, $downloadRootUrl) {
 	foreach ($structure as $entry) {
+		$type = $entry['type'];
 		$name = $entry['name'];
 		$path = sprintf('%s/%s', $root, $name);
-		echo sprintf('Processing entry with name "%s" and path "%s"', $name, $path), PHP_EOL;
-		switch ($entry['type']) {
+		output(sprintf('Processing entry of type "%s" with name "%s" and path "%s"', $type, $name, $path), 'info');
+		switch ($type) {
 			case 'directory':
 				if (!mkdir($path)) {
 					throw new RuntimeException(sprintf('Could not create directory "%s"', $path));

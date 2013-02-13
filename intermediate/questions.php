@@ -57,7 +57,7 @@ return array(
 			'Email addresses can be added to the configuration file and referred to throughout the site, either for form processing or display purposes.'
 		),
 		'type' => 'loop',
-		'default' => false,
+		'default' => 'no',
 		'dependents' => array(
 			array(
 				'question' => 'Please enter the email address key (e.g. "admin" or "contact")',
@@ -89,7 +89,7 @@ return array(
 			'If you don\'t know what this is, select "no".'
 		),
 		'type' => 'boolean',
-		'default' => false
+		'default' => 'no'
 	),
 	array(
 		'question' => 'Do you want to include HTML5 boilerplate?',
@@ -97,7 +97,7 @@ return array(
 			'HTML5 boilerplate provides a useful starting point for your HTML5 page templates.'
 		),
 		'type' => 'boolean',
-		'default' => true,
+		'default' => 'yes',
 		'dependents' => array(
 			array(
 				'question' => 'Do you want to include the IE-specific html element classes?',
@@ -105,7 +105,7 @@ return array(
 					'This is an optional feature of HTML5 boilerplate which provides version-specific classes on the root (html) element.',
 				),
 				'type' => 'boolean',
-				'default' => false
+				'default' => 'no'
 			)
 		)
 	),
@@ -117,7 +117,7 @@ return array(
 			'This option must be selected if you are using any modules that require Doctrine module, otherwise additional configuration is required'
 		),
 		'type' => 'boolean',
-		'default' => false,
+		'default' => 'no',
 		'dependents' => array(
 			array(
 				'question' => 'Please enter the database name',
@@ -140,7 +140,7 @@ return array(
 			'Any PSR-3 compatible logging framework may be used.'
 		),
 		'type' => 'boolean',
-		'default' => true,
+		'default' => 'yes',
 		'dependents' => array(
 			array(
 				'question' => 'What is the filename you wish to record the log messages in?',
@@ -168,7 +168,7 @@ return array(
 			'It is safe to enable this even if XSendfile is not available, it will only be used if it is both configured and detected.'
 		),
 		'type' => 'boolean',
-		'default' => true,
+		'default' => 'yes',
 		'dependents' => array(
 			array(
 				'question' => '',
