@@ -13,23 +13,63 @@
  * @param array $questions
  * @param array $structure
  * @param array $data
+ *
+ * @throws RuntimeException
  */
 function askQuestions(array $questions, array &$structure, array &$data) {
+	// Initialise.
+	output('Please answer the following questions to customise your Sitegear website.  You can accept the defaults for many of the questions if you wish.', 'info');
+	$booleanPositive = array( 'yes', 'y', '1', 'true',  't' );
+	$booleanNegative = array( 'no',  'n', '0', 'false', 'f' );
+
+	// Ask each question in turn, recurse for dependents.
 	foreach ($questions as $question) {
+		// Display the question and notes.
 		output(PHP_EOL . $question['question'], 'success');
 		if (isset($question['notes'])) {
 			output(implode(PHP_EOL, $question['notes']), 'info');
 		}
-		$hint = isset($question['default']) ? 'default = ' . $question['default'] : 'required';
-		$answer = '';
-		while (strlen($answer) === 0) {
-			$answer = readline(sprintf('Please give your answer (%s): ', $hint));
-			if (strlen($answer) === 0 && isset($question['default'])) {
-				$answer = $question['default'];
+
+		// Prompt for an answer until a valid one is given.
+		$answer = null;
+		$required = isset($question['required']) && $question['required'];
+		$hint = $required ?
+				'required' :
+				sprintf('default = %s', isset($question['default']) ? sprintf('"%s"', $question['default']) : '[empty]');
+		while (is_null($answer)) {
+			$response = readline(sprintf('Please give your answer (%s): ', $hint));
+			if (strlen($response) === 0 && isset($question['default'])) {
+				$response = $question['default'];
+			}
+			$type = $question['type'];
+			if ($type === 'boolean' || $type === 'loop') {
+				if (in_array($response, $booleanPositive)) {
+					$answer = true;
+				} elseif (in_array($response, $booleanNegative)) {
+					$answer = false;
+				} else {
+					output(sprintf('You must answer either positively (%s) or negatively (%s)', implode(',', $booleanPositive), implode(',', $booleanNegative)), 'error');
+				}
+			} elseif ($type === 'string') {
+				if (!$required || strlen($response) > 0) {
+					$answer = $response;
+				}
+			} else {
+				throw new RuntimeException(sprintf('Invalid question type "%s" specified.', $type));
 			}
 		}
-		output(sprintf('Answered %s', $answer), 'success');
+
+		// Handle the answer given.
+		output(sprintf('Answered %s', is_string($answer) ? $answer : ($answer ? 'true' : 'false')));
+		// TODO
+
+		// Process dependent questions.  Answer must be either true (boolean/loop types) or non-empty (string types)
+		// for this to go ahead, otherwise it is skipped.
+		if ($answer && isset($question['dependents']) && is_array($question['dependents'])) {
+			askQuestions($question['dependents'], $structure, $data);
+		}
 	}
+	output('All questions answered', 'success');
 }
 
 /**
@@ -53,6 +93,7 @@ function askQuestions(array $questions, array &$structure, array &$data) {
  * @throws RuntimeException
  */
 function buildStructure(array $structure, array $data, $root, $downloadRootUrl) {
+	output(sprintf('Building the file system structure in the local staging area at "%s"... ', $root), 'info');
 	foreach ($structure as $entry) {
 		$type = $entry['type'];
 		$name = $entry['name'];
@@ -83,6 +124,7 @@ function buildStructure(array $structure, array $data, $root, $downloadRootUrl) 
 				break;
 		}
 	}
+	output(sprintf('File system structure created in local staging area at "%s"', $root), 'success');
 }
 
 /**
@@ -95,7 +137,8 @@ function buildStructure(array $structure, array $data, $root, $downloadRootUrl) 
  *
  * @throws RuntimeException
  */
-function moveAll($source, $target, $removeSource=true) {
+function deploy($source, $target, $removeSource=true) {
+	output(sprintf('Deploying file system structure from staging area "%s" to target "%s"... ', $source, $target), 'info');
 	foreach (scandir($source) as $file) {
 		if (!in_array($file, array( '.', '..' ))) {
 			$sourceFile = sprintf('%s/%s', $source, $file);
@@ -110,16 +153,19 @@ function moveAll($source, $target, $removeSource=true) {
 			throw new RuntimeException(sprintf('Could not remove source directory "%s"', $source));
 		}
 	}
+	output(sprintf('File system structure deployed to "%s"', $target), 'success');
 }
 
 /**
  * Download composer.phar and use it to install dependencies.
  */
 function composerInstall($target, $localResourcesCache, array $additionalArguments=null) {
+	output('Processing dependencies using Composer... ', 'info');
 	$composerInstaller = $localResourcesCache . '/install-composer.php';
 	copy('https://getcomposer.org/installer', $composerInstaller);
 	passthru(sprintf('php %s', $composerInstaller));
 	passthru(sprintf('php %s/composer.phar install %s', $target, implode(' ', $additionalArguments ?: array())));
+	output('Dependencies deployed successfully by Composer', 'success');
 }
 
 /**
