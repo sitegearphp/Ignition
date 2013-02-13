@@ -66,11 +66,29 @@ return array(
 					),
 					array(
 						'name' => 'sections',
-						'type' => 'directory'
+						'type' => 'directory',
+						'contents' => array(
+							array(
+								'name' => 'main',
+								'type' => 'directory',
+								'contents' => array(
+									array(
+										'name' => 'index.phtml',
+										'type' => 'download'
+									)
+								)
+							)
+						)
 					),
 					array(
 						'name' => 'templates',
-						'type' => 'directory'
+						'type' => 'directory',
+						'contents' => array(
+							array(
+								'name' => 'default.phtml',
+								'type' => 'template'
+							)
+						)
 					),
 					array(
 						'name' => 'navigation.json',
