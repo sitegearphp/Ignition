@@ -18,7 +18,6 @@
  * @throws RuntimeException
  */
 function askQuestions(array $questions, array &$structure, array &$data) {
-	output('Please answer the following questions to customise your Sitegear website.  You can accept the defaults for many of the questions if you wish.', 'info');
 	foreach ($questions as $question) {
 		$askQuestion = true;
 		while ($askQuestion) {
@@ -36,7 +35,6 @@ function askQuestions(array $questions, array &$structure, array &$data) {
 			$askQuestion = ($question['type'] === 'loop') && $answer;
 		}
 	}
-	output('All questions answered', 'success');
 }
 
 /**
@@ -105,11 +103,7 @@ function askUntilValidAnswer(array $question) {
 function getHint(array $question) {
 	$required = isset($question['required']) && $question['required'];
 	$default = sprintf('default = %s', isset($question['default']) ? sprintf('"%s"', $question['default']) : '[empty]');
-	return sprintf(
-		'%s%s',
-		$required && !isset($question['default']) ? '' : $default,
-		$required ? '[required]' : ''
-	);
+	return $required ? (!isset($question['default']) ? 'required' : sprintf('required; %s', $default)) : $default;
 }
 
 /**
@@ -140,18 +134,18 @@ function handleAnswer(array $question, $answer, array &$structure, array &$data)
  *
  * @param array $structure Nested array structure to build the file system structure from.
  * @param array $data Nested array structure containing data for JSON files, indexed at the top level by filename.
- * @param string $root The path to create the structure at; must already exist and have the relevant permissions set.
+ * @param string $rootDir The path to create the structure at; must already exist and have the relevant permissions set.
  * @param string $downloadRootUrl The root URL, ending with a slash `/`, under which the required resources can be
  *   accessed.
  *
  * @throws RuntimeException
  */
-function buildStructure(array $structure, array $data, $root, $downloadRootUrl) {
-	output(sprintf('Building the file system structure in the local staging area at "%s"... ', $root), 'info');
+function buildStructure(array $structure, array $data, $rootDir, $downloadRootUrl) {
+	output(sprintf('Building the file system structure in the local staging area at "%s"... ', $rootDir), 'info');
 	foreach ($structure as $entry) {
 		$type = $entry['type'];
 		$name = $entry['name'];
-		$path = sprintf('%s/%s', $root, $name);
+		$path = sprintf('%s/%s', $rootDir, $name);
 		output(sprintf('Processing entry of type "%s" with name "%s" and path "%s"', $type, $name, $path), 'info');
 		switch ($type) {
 			case 'directory':
@@ -178,7 +172,6 @@ function buildStructure(array $structure, array $data, $root, $downloadRootUrl) 
 				break;
 		}
 	}
-	output(sprintf('File system structure created in local staging area at "%s"', $root), 'success');
 }
 
 /**
@@ -213,13 +206,11 @@ function deploy($source, $target, $removeSource=true) {
 /**
  * Download composer.phar and use it to install dependencies.
  */
-function composerInstall($target, $localResourcesCache, array $additionalArguments=null) {
-	output('Processing dependencies using Composer... ', 'info');
-	$composerInstaller = $localResourcesCache . '/install-composer.php';
+function composerInstall($target, $localCacheDir, array $additionalArguments=null) {
+	$composerInstaller = $localCacheDir . '/install-composer.php';
 	copy('https://getcomposer.org/installer', $composerInstaller);
 	passthru(sprintf('php %s', $composerInstaller));
 	passthru(sprintf('php %s/composer.phar install %s', $target, implode(' ', $additionalArguments ?: array())));
-	output('Dependencies deployed successfully by Composer', 'success');
 }
 
 /**
