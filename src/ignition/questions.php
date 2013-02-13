@@ -18,14 +18,28 @@ return array(
 			'This is recommended but not required in dedicated hosting environments.'
 		),
 		'type' => 'string',
-		'required' => true
+		'required' => true,
+		'actions' => array(
+			array(
+				'type' => 'data',
+				'name' => 'configuration.json',
+				'key' => 'site.id'
+			)
+		)
 	),
 	array(
 		'question' => 'Please enter a site display name',
 		'notes' => array(
 			'This is used in content management tools and may be used within the site as a configuration item.'
 		),
-		'type' => 'string'
+		'type' => 'string',
+		'actions' => array(
+			array(
+				'type' => 'data',
+				'name' => 'configuration.json',
+				'key' => 'site.display-name'
+			)
+		)
 	),
 	array(
 		'question' => 'Please enter the URL of the site logo',
@@ -33,7 +47,14 @@ return array(
 			'This is used in content management tools and may be used within the site as a configuration item.',
 			'This may be an absolute URL or a relative URL within the site itself.'
 		),
-		'type' => 'string'
+		'type' => 'string',
+		'actions' => array(
+			array(
+				'type' => 'data',
+				'name' => 'configuration.json',
+				'key' => 'site.logo-url'
+			)
+		)
 	),
 	array(
 		'question' => 'Please enter the site administrator\'s name',
@@ -41,7 +62,14 @@ return array(
 			'This is displayed on error pages.',
 			'If you do not wish to use an individual\'s name, use something like "the site administrator".'
 		),
-		'type' => 'string'
+		'type' => 'string',
+		'actions' => array(
+			array(
+				'type' => 'data',
+				'name' => 'configuration.json',
+				'key' => 'site.administrator.name'
+			)
+		)
 	),
 	array(
 		'question' => 'Please enter the site administrator\'s email address',
@@ -49,7 +77,14 @@ return array(
 			'This is displayed on error pages.',
 			'If you do not wish to use an individual\'s email address, use an alias or leave this blank.'
 		),
-		'type' => 'string'
+		'type' => 'string',
+		'actions' => array(
+			array(
+				'type' => 'data',
+				'name' => 'configuration.json',
+				'key' => 'site.administrator.email'
+			)
+		)
 	),
 	array(
 		'question' => 'Do you need to add a site email address?',
@@ -62,16 +97,48 @@ return array(
 			array(
 				'question' => 'Please enter the email address key (e.g. "admin" or "contact")',
 				'type' => 'string',
-				'required' => true
+				'required' => true,
+				'actions' => array(
+					array(
+						'type' => 'store',
+						'name' => 'emailKey'
+					)
+				)
 			),
 			array(
 				'question' => 'Please enter the email address',
 				'type' => 'string',
-				'required' => true
+				'required' => true,
+				'actions' => array(
+					array(
+						'type' => 'store',
+						'name' => 'emailValue'
+					)
+				)
 			),
 			array(
 				'question' => 'Please enter the override email address for development environments',
-				'type' => 'string'
+				'type' => 'string',
+				'actions' => array(
+					array(
+						'type' => 'store',
+						'name' => 'emailDevOverride'
+					)
+				)
+			)
+		),
+		'actions' => array(
+			array(
+				'type' => 'data',
+				'name' => 'configuration.json',
+				'key' => 'site.email.%emailKey%',
+				'value' => '%emailValue%'
+			),
+			array(
+				'type' => 'data',
+				'name' => 'configuration.development.json',
+				'key' => 'site.email.%emailKey%',
+				'value' => '%emailDevOverride%'
 			)
 		)
 	),
@@ -82,7 +149,13 @@ return array(
 			'If you are using a different server or select no, additional configuration may be required.'
 		),
 		'type' => 'boolean',
-		'default' => 'no'
+		'default' => 'no',
+		'actions' => array(
+			array(
+				'type' => 'store',
+				'name' => 'generateHtaccess'
+			)
+		)
 	),
 	array(
 		'question' => 'Do you want to include and activate XSendfile?',
@@ -95,8 +168,22 @@ return array(
 		'default' => 'yes',
 		'dependents' => array(
 			array(
-				'question' => '',
-				'type' => 'string'
+				'question' => 'What is the name of the XSendfile header?',
+				'type' => 'string',
+				'default' => 'X-Sendfile',
+				'actions' => array(
+					array(
+						'type' => 'data',
+						'name' => 'configuration.json',
+						'key' => 'system.file-response.header'
+					)
+				)
+			)
+		),
+		'actions' => array(
+			array(
+				'type' => 'store',
+				'name' => 'activateXSendfile'
 			)
 		)
 	),
@@ -106,8 +193,15 @@ return array(
 			'If you don\'t know what this is, select "no".'
 		),
 		'type' => 'boolean',
-		'default' => 'no'
+		'default' => 'no',
+		'actions' => array(
+			array(
+				'type' => 'store',
+				'name' => 'useXml'
+			)
+		)
 	),
+/** TODO
 	array(
 		'question' => 'Do you want to include HTML5 boilerplate?',
 		'notes' => array(
@@ -126,6 +220,7 @@ return array(
 			)
 		)
 	),
+**/
 	array(
 		'question' => 'Do you need a database?',
 		'notes' => array(
@@ -138,15 +233,44 @@ return array(
 		'dependents' => array(
 			array(
 				'question' => 'Please enter the database name',
-				'type' => 'string'
+				'type' => 'string',
+				'actions' => array(
+					array(
+						'type' => 'data',
+						'name' => 'configuration.json',
+						'key' => 'modules.doctrine.connection.dbname'
+					)
+				)
 			),
 			array(
 				'question' => 'Please enter the username',
-				'type' => 'string'
+				'type' => 'string',
+				'actions' => array(
+					array(
+						'type' => 'data',
+						'name' => 'configuration.json',
+						'key' => 'modules.doctrine.connection.user'
+					)
+				)
 			),
 			array(
 				'question' => 'Please enter the password',
-				'type' => 'string'
+				'type' => 'string',
+				'actions' => array(
+					array(
+						'type' => 'data',
+						'name' => 'configuration.json',
+						'key' => 'modules.doctrine.connection.password'
+					)
+				)
+			)
+		),
+		'actions' => array(
+			array(
+				'type' => 'data',
+				'name' => 'configuration.json',
+				'key' => 'modules.doctrine.connection.driver',
+				'value' => 'pdo_mysql'
 			)
 		)
 	),
@@ -158,6 +282,7 @@ return array(
 		),
 		'type' => 'boolean',
 		'default' => 'yes',
+/** TODO
 		'dependents' => array(
 			array(
 				'question' => 'What is the filename you wish to record the log messages in?',
@@ -165,7 +290,14 @@ return array(
 					'Relative to the site root.'
 				),
 				'type' => 'string',
-				'default' => 'sitegear.log'
+				'default' => 'sitegear.log',
+				'actions' => array(
+					array(
+						'type' => 'data',
+						'name' => 'configuration.json',
+						'key' => 'modules.doctrine.connection.dbname'
+					)
+				)
 			),
 			array(
 				'question' => 'What is the minimum logging level you wish to use?',
@@ -177,6 +309,7 @@ return array(
 				'default' => 'info'
 			)
 		)
+ **/
 	),
 	array(
 		'question' => 'Do you want to add a user?',
@@ -188,12 +321,48 @@ return array(
 		'default' => 'no',
 		'dependents' => array(
 			array(
-				'question' => 'Please enter the username',
-				'type' => 'string'
+				'question' => 'Please enter the user\'s email address (username)',
+				'type' => 'string',
+				'actions' => array(
+					array(
+						'type' => 'store',
+						'name' => 'userEmail'
+					)
+				)
 			),
 			array(
-				'question' => 'Please enter the password',
-				'type' => 'string'
+				'question' => 'Please enter the user\'s password',
+				'type' => 'string',
+				'actions' => array(
+					array(
+						'type' => 'store',
+						'name' => 'userPassword'
+					)
+				)
+			),
+			array(
+				'question' => 'Please enter the user\'s real (display) name',
+				'type' => 'string',
+				'actions' => array(
+					array(
+						'type' => 'store',
+						'name' => 'userName'
+					)
+				)
+			)
+		),
+		'actions' => array(
+			array(
+				'type' => 'data',
+				'name' => 'users.json',
+				'value' => array(
+					'active' => true,
+					'data' => array(
+						'email' => '%userEmail%',
+						'password' => '%userPassword%',
+						'name' => '%userName%'
+					)
+				)
 			)
 		)
 	)
