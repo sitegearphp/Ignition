@@ -22,13 +22,12 @@ To create a skeleton website with the necessary boilerplate to start working in 
         mkdir mywebsite.com
         cd mywebsite.com
 
- 2. Download and execute the ignition script in one command with `curl`:
+ 2. Download and execute the ignition script:
 
-        curl -s http://sitegear.org/ignition/resources/ignition.php | php
+        php -r "eval('?>'.file_get_contents('http://sitegear.org/ignition/resources/ignition.php'));"
 
-    Or if you prefer `wget`:
-
-        wget -q -O - http://sitegear.org/ignition/resources/ignition.php | php
+    Note that due to the interactive nature of the script, the method `curl -s [url] | php` does not work; the pipe `|`
+    breaks the ability to receive user input.
 
  3. Answer the questions when prompted.
 
