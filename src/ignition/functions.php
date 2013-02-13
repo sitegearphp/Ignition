@@ -14,23 +14,30 @@
  * @param array $questions
  * @param array $structure
  * @param array $data
+ * @param array $values
  *
  * @throws RuntimeException
  */
-function askQuestions(array $questions, array &$structure, array &$data) {
-	$values = array();
+function askQuestions(array $questions, array &$structure, array &$data, array &$values=null) {
+	if (is_null($values)) {
+		// This is the first call, so create a new $values array.  Recursive calls pass this back through.
+		$values = array();
+	}
 	foreach ($questions as $question) {
 		$askQuestion = true;
 		while ($askQuestion) {
-			// Write the question, get a valid answer, and handle that answer.
+			// Q and A
 			writeQuestionText($question);
 			$answer = askUntilValidAnswer($question);
-			handleAnswer($question, $answer, $data, $values);
 
-			// Process dependent questions.
+			// Process dependents.
 			if ($answer && isset($question['dependents']) && is_array($question['dependents'])) {
-				askQuestions($question['dependents'], $structure, $data);
+				askQuestions($question['dependents'], $structure, $data, $values);
 			}
+
+			// Handle the original answer.  This is done after dependents are processed so that answers from dependents
+			// can be used in the replacements performed here.
+			handleAnswer($question, $answer, $data, $values);
 
 			// Only go again if this was a 'loop' type question and the answer was positive.
 			$askQuestion = ($question['type'] === 'loop') && $answer;
@@ -112,16 +119,23 @@ function getHint(array $question) {
  * `%token%` where "token" is any key in the `$values` array will be replaced by the corresponding value from the
  * `$values` array.  Tokens with no matching key in `$values` will not be replaced.
  *
- * @param string $text
+ * @param mixed $value
  * @param array $values
  *
  * @return mixed
  */
-function performTokenReplacements($text, array $values) {
-	foreach ($values as $key => $value) {
-		$text = preg_replace(sprintf('/%%%s%%/', $key), $value, $text);
+function performTokenReplacements($value, array $values) {
+	output(sprintf('Performing token replacements on %s', is_array($value) ? 'array value' : $value), 'info');
+	if (is_array($value)) {
+		foreach ($value as $k => $v) {
+			$value[$k] = performTokenReplacements($v, $values);
+		}
+	} elseif (is_string($value)) {
+		foreach ($values as $k => $v) {
+			$value = preg_replace(sprintf('/%%%s%%/', $k), $v, $value);
+		}
 	}
-	return $text;
+	return $value;
 }
 
 /**
@@ -136,24 +150,25 @@ function performTokenReplacements($text, array $values) {
  */
 function handleAnswer(array $question, $answer, array &$data, array &$values) {
 	// Handle the answer given.
-	output(sprintf('Answered %s', is_string($answer) ? $answer : ($answer ? 'true' : 'false')));
+	output(sprintf('Answered "%s" to "%s"', is_string($answer) ? $answer : ($answer ? 'true' : 'false'), $question['question']));
 	$positive = is_string($answer) ? (strlen($answer) > 0) : $answer === true;
 	if ($positive && isset($question['actions']) && is_array($question['actions'])) {
 		foreach ($question['actions'] as $action) {
+			$actionAnswer = performTokenReplacements((isset($action['value']) ? $action['value'] : $answer), $values);
 			$name = $action['name'];
 			switch ($action['type']) {
 				case 'data':
 					if (isset($action['key'])) {
 						$key = performTokenReplacements($action['key'], $values);
-						$answer = performTokenReplacements($answer, $values);
-						$dataForKey = buildDataForKey($key, $answer, $values);
+						$dataForKey = buildDataForKey($key, $actionAnswer, $values);
 					} else {
-						$dataForKey = array( $answer );
+						$dataForKey = array( $actionAnswer );
 					}
-					$data[$name] = array_merge($data[$name], $dataForKey);
+
+					$data[$name] = array_merge_recursive($data[$name], $dataForKey);
 					break;
 				case 'store':
-					$values[$name] = $answer;
+					$values[$name] = $actionAnswer;
 					break;
 				default:
 					throw new RuntimeException(sprintf('Unknown action type "%s" found for question "%s"', $action['type'], $question['question']));
