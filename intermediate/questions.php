@@ -12,14 +12,6 @@
  */
 return array(
 	array(
-		'question' => 'What is your minimum stability requirement?',
-		'notes' => array(
-			'Currently "dev" is required.'
-		),
-		'type' => 'string',
-		'default' => 'dev'
-	),
-	array(
 		'question' => 'Please enter a site id',
 		'notes' => array(
 			'This is a unique identifier, in lower-case-with-hyphens, for the site.',
@@ -47,7 +39,15 @@ return array(
 		'question' => 'Please enter the site administrator\'s name',
 		'notes' => array(
 			'This is displayed on error pages.',
-			'If you do not wish to use an individual\s name, use something like "the site administrator".'
+			'If you do not wish to use an individual\'s name, use something like "the site administrator".'
+		),
+		'type' => 'string'
+	),
+	array(
+		'question' => 'Please enter the site administrator\'s email address',
+		'notes' => array(
+			'This is displayed on error pages.',
+			'If you do not wish to use an individual\'s email address, use an alias or leave this blank.'
 		),
 		'type' => 'string'
 	),
@@ -81,7 +81,24 @@ return array(
 			'This will generate a .htaccess file.',
 			'If you are using a different server or select no, additional configuration may be required.'
 		),
-		'type' => 'boolean'
+		'type' => 'boolean',
+		'default' => 'no'
+	),
+	array(
+		'question' => 'Do you want to include and activate XSendfile?',
+		'notes' => array(
+			'XSendfile is any web server module or function which allows direct serving of static files after processing by dynamic scripts like PHP.',
+			'Examples exist for Apache and for other web servers, but not for the PHP built-in web server.',
+			'It is perfectly safe to enable this even if XSendfile is not available, it will only be used if it is both configured and detected.'
+		),
+		'type' => 'boolean',
+		'default' => 'yes',
+		'dependents' => array(
+			array(
+				'question' => '',
+				'type' => 'string'
+			)
+		)
 	),
 	array(
 		'question' => 'Do you want to use XML style markup?',
@@ -162,27 +179,13 @@ return array(
 		)
 	),
 	array(
-		'question' => 'Do you want to include and activate XSendfile?',
-		'notes' => array(
-			'XSendfile is any web server module or function which allows direct serving of static files after processing by dynamic scripts like PHP.',
-			'It is safe to enable this even if XSendfile is not available, it will only be used if it is both configured and detected.'
-		),
-		'type' => 'boolean',
-		'default' => 'yes',
-		'dependents' => array(
-			array(
-				'question' => '',
-				'type' => 'string'
-			)
-		)
-	),
-	array(
 		'question' => 'Do you want to add a user?',
 		'notes' => array(
 			'Users created here will have full administration privileges',
 			'At least one user must be created for access to the content management tools without further configuration.'
 		),
 		'type' => 'loop',
+		'default' => 'no',
 		'dependents' => array(
 			array(
 				'question' => 'Please enter the username',
