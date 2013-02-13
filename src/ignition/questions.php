@@ -201,7 +201,7 @@ return array(
 			)
 		)
 	),
-/** TODO
+/** TODO Support this
 	array(
 		'question' => 'Do you want to include HTML5 boilerplate?',
 		'notes' => array(
@@ -282,7 +282,7 @@ return array(
 		),
 		'type' => 'boolean',
 		'default' => 'yes',
-/** TODO
+/** TODO Support this
 		'dependents' => array(
 			array(
 				'question' => 'What is the filename you wish to record the log messages in?',
