@@ -80,7 +80,8 @@ return array(
 		'notes' => array(
 			'This will generate a .htaccess file.',
 			'If you are using a different server or select no, additional configuration may be required.'
-		)
+		),
+		'type' => 'boolean'
 	),
 	array(
 		'question' => 'Do you want to use XML style markup?',
@@ -181,6 +182,7 @@ return array(
 			'Users created here will have full administration privileges',
 			'At least one user must be created for access to the content management tools without further configuration.'
 		),
+		'type' => 'loop',
 		'dependents' => array(
 			array(
 				'question' => 'Please enter the username',

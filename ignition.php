@@ -101,7 +101,8 @@ call_user_func(function() {
 		output('Requirements fulfilled', 'success');
 
 		// TODO Ask questions and update data structures accordingly
-//		output('Please answer the following questions to customise your Sitegear website.  You can accept the defaults for many of the questions if you wish.', 'info');
+		output('Please answer the following questions to customise your Sitegear website.  You can accept the defaults for many of the questions if you wish.', 'info');
+		askQuestions($questions, $structure, $data);
 
 		output('Building the file system structure in the local staging area...', 'info');
 		buildStructure($structure, $data, $localStaging, $targetResourcesRootUrl);

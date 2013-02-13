@@ -7,6 +7,21 @@
  */
 
 /**
+ * Ask the questions provided, and update the `$structure` and `$data` arrays according to the answers and the question
+ * metadata.
+ *
+ * @param array $questions
+ * @param array $structure
+ * @param array $data
+ */
+function askQuestions(array $questions, array &$structure, array &$data) {
+	foreach ($questions as $question) {
+		$answer = readline(sprintf('%s [%s]: ', $question['question'], $question['type']));
+		echo sprintf('Answered %s', $answer), PHP_EOL;
+	}
+}
+
+/**
  * Create the file system structure corresponding to the given nested array structure.  Each entry is a key-value
  * array, with the keys `name` (the file or directory name), `type` (see below), and in the case of `directory`
  * entries, a `contents` key which maps to an array which repeats the structure (and causes a recursive call).
