@@ -158,19 +158,18 @@ return array(
 		)
 	),
 	array(
-		'question' => 'Do you want to include and activate XSendfile?',
+		'question' => 'Do you want to include and activate X-Sendfile?',
 		'notes' => array(
-			'XSendfile is any web server module or function which allows direct serving of static files after processing by dynamic scripts like PHP.',
-			'Examples exist for Apache and for other web servers, but not for the PHP built-in web server.',
-			'It is perfectly safe to enable this even if XSendfile is not available, it will only be used if it is both configured and detected.'
+			'X-Sendfile is any web server module or function which allows direct serving of static files after processing by dynamic scripts like PHP.',
+			'Examples exist for Apache and for other web servers, but not for the PHP built-in web server.  The header name is configurable for different implementations.',
+			'It is perfectly safe to enable this even if X-Sendfile is not available, it will only be used if it is both configured and detected.'
 		),
 		'type' => 'boolean',
 		'default' => 'yes',
 		'dependents' => array(
 			array(
-				'question' => 'What is the name of the XSendfile header?',
+				'question' => 'Do you want to override the name of the X-Sendfile header?',
 				'type' => 'string',
-				'default' => 'X-Sendfile',
 				'actions' => array(
 					array(
 						'type' => 'data',
