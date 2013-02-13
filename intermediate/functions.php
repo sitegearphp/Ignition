@@ -8,7 +8,8 @@
 
 /**
  * Ask the questions provided, and update the `$structure` and `$data` arrays according to the answers and the question
- * metadata.
+ * metadata.  Recurse into `dependent` questions, only when the answer is either true (boolean/loop types) or non-empty
+ * (string types).
  *
  * @param array $questions
  * @param array $structure
@@ -17,59 +18,112 @@
  * @throws RuntimeException
  */
 function askQuestions(array $questions, array &$structure, array &$data) {
-	// Initialise.
 	output('Please answer the following questions to customise your Sitegear website.  You can accept the defaults for many of the questions if you wish.', 'info');
-	$booleanPositive = array( 'yes', 'y', '1', 'true',  't' );
-	$booleanNegative = array( 'no',  'n', '0', 'false', 'f' );
-
-	// Ask each question in turn, recurse for dependents.
 	foreach ($questions as $question) {
-		// Display the question and notes.
-		output(PHP_EOL . $question['question'], 'success');
-		if (isset($question['notes'])) {
-			output(implode(PHP_EOL, $question['notes']), 'info');
-		}
+		$askQuestion = true;
+		while ($askQuestion) {
+			// Write the question, get a valid answer, and handle that answer.
+			writeQuestionText($question);
+			$answer = askUntilValidAnswer($question);
+			handleAnswer($question, $answer, $structure, $data);
 
-		// Prompt for an answer until a valid one is given.
-		$answer = null;
-		$required = isset($question['required']) && $question['required'];
-		$hint = $required ?
-				'required' :
-				sprintf('default = %s', isset($question['default']) ? sprintf('"%s"', $question['default']) : '[empty]');
-		while (is_null($answer)) {
-			$response = readline(sprintf('Please give your answer (%s): ', $hint));
-			if (strlen($response) === 0 && isset($question['default'])) {
-				$response = $question['default'];
+			// Process dependent questions.
+			if ($answer && isset($question['dependents']) && is_array($question['dependents'])) {
+				askQuestions($question['dependents'], $structure, $data);
 			}
-			$type = $question['type'];
-			if ($type === 'boolean' || $type === 'loop') {
-				if (in_array($response, $booleanPositive)) {
-					$answer = true;
-				} elseif (in_array($response, $booleanNegative)) {
-					$answer = false;
-				} else {
-					output(sprintf('You must answer either positively (%s) or negatively (%s)', implode(',', $booleanPositive), implode(',', $booleanNegative)), 'error');
-				}
-			} elseif ($type === 'string') {
-				if (!$required || strlen($response) > 0) {
-					$answer = $response;
-				}
-			} else {
-				throw new RuntimeException(sprintf('Invalid question type "%s" specified.', $type));
-			}
-		}
 
-		// Handle the answer given.
-		output(sprintf('Answered %s', is_string($answer) ? $answer : ($answer ? 'true' : 'false')));
-		// TODO
-
-		// Process dependent questions.  Answer must be either true (boolean/loop types) or non-empty (string types)
-		// for this to go ahead, otherwise it is skipped.
-		if ($answer && isset($question['dependents']) && is_array($question['dependents'])) {
-			askQuestions($question['dependents'], $structure, $data);
+			// Only go again if this was a 'loop' type question and the answer was positive.
+			$askQuestion = ($question['type'] === 'loop') && $answer;
 		}
 	}
 	output('All questions answered', 'success');
+}
+
+/**
+ * Output the 'text' of the given question, that is, the question itself and any additional notes.
+ *
+ * @param array $question
+ */
+function writeQuestionText(array $question) {
+	output(PHP_EOL . $question['question'], 'success');
+	if (isset($question['notes'])) {
+		output(' * ' . implode(PHP_EOL . ' * ', $question['notes']), 'info');
+	}
+}
+
+/**
+ * Write the prompt and receive input from the user for the given question, until a valid response is given.  Convert
+ * that response into the relevant type and return it.
+ *
+ * @param array $question Definition of question to ask.
+ *
+ * @return string|boolean Given answer.
+ *
+ * @throws RuntimeException
+ */
+function askUntilValidAnswer(array $question) {
+	// Initialise
+	$booleanPositive = array( 'yes', 'y', '1', 'true',  't' );
+	$booleanNegative = array( 'no',  'n', '0', 'false', 'f' );
+	$type = $question['type'];
+	$required = isset($question['required']) && $question['required'];
+
+	// Prompt for an answer until a valid one is given.
+	$answer = null;
+	while (is_null($answer)) {
+		$response = readline(sprintf('Please give your answer (%s): ', getHint($question)));
+		if (strlen($response) === 0 && isset($question['default'])) {
+			$response = $question['default'];
+		}
+		if ($type === 'boolean' || $type === 'loop') {
+			if (in_array($response, $booleanPositive)) {
+				$answer = true;
+			} elseif (in_array($response, $booleanNegative)) {
+				$answer = false;
+			} else {
+				output(sprintf('You must answer either positively (%s) or negatively (%s)', implode(',', $booleanPositive), implode(',', $booleanNegative)), 'error');
+			}
+		} elseif ($type === 'string') {
+			if (!$required || strlen($response) > 0) {
+				$answer = $response;
+			}
+		} else {
+			throw new RuntimeException(sprintf('Invalid question type "%s" specified.', $type));
+		}
+	}
+	return $answer;
+}
+
+/**
+ * Get the hint text for the given question.  That is, a representation of whether the question requires an answer or
+ * not and what the default value is if no input is given (i.e. user just presses return).
+ *
+ * @param array $question Question definition array.
+ *
+ * @return string Text to display.
+ */
+function getHint(array $question) {
+	$required = isset($question['required']) && $question['required'];
+	$default = sprintf('default = %s', isset($question['default']) ? sprintf('"%s"', $question['default']) : '[empty]');
+	return sprintf(
+		'%s%s',
+		$required && !isset($question['default']) ? '' : $default,
+		$required ? '[required]' : ''
+	);
+}
+
+/**
+ * Handle the given answer to the given question, potentially by updating the given data arrays.
+ *
+ * @param array $question
+ * @param string|boolean $answer
+ * @param array $structure
+ * @param array $data
+ */
+function handleAnswer(array $question, $answer, array &$structure, array &$data) {
+	// Handle the answer given.
+	output(sprintf('Answered %s', is_string($answer) ? $answer : ($answer ? 'true' : 'false')));
+	// TODO
 }
 
 /**
