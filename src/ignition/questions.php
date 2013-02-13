@@ -274,6 +274,7 @@ return array(
 			)
 		)
 	),
+/** TODO Support this
 	array(
 		'question' => 'Do you want to include and activate Monolog?',
 		'notes' => array(
@@ -282,7 +283,6 @@ return array(
 		),
 		'type' => 'boolean',
 		'default' => 'yes',
-/** TODO Support this
 		'dependents' => array(
 			array(
 				'question' => 'What is the filename you wish to record the log messages in?',
@@ -309,8 +309,8 @@ return array(
 				'default' => 'info'
 			)
 		)
- **/
 	),
+**/
 	array(
 		'question' => 'Do you want to add a user?',
 		'notes' => array(
