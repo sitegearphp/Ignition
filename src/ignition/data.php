@@ -30,24 +30,15 @@ return array(
 	/**
 	 * Main configuration file.
 	 */
-	'configuration.json' => array(
-		'site' => array(),
-		'routes' => array(),
-		'templates' => array(),
-		'modules' => array()
-	),
+	'configuration.json' => array(),
 	/**
 	 * Development configuration overrides file.
 	 */
-	'configuration.development.json' => array(
-		'site' => array(),
-		'modules' => array()
-	),
+	'configuration.development.json' => array(),
 	/**
 	 * User data file (authentication and access control).
 	 */
-	'users.json' => array(
-	),
+	'users.json' => array(),
 	/**
 	 * Navigation data file (for generation of site navigation, breadcrumbs, sitemaps, etc).
 	 */
