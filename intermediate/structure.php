@@ -18,15 +18,15 @@ return array(
 		'contents' => array(
 			array(
 				'name' => 'configuration.json',
-				'type' => 'generated'
+				'type' => 'json'
 			),
 			array(
 				'name' => 'configuration.development.json',
-				'type' => 'generated'
+				'type' => 'json'
 			),
 			array(
 				'name' => 'users.json',
-				'type' => 'generated'
+				'type' => 'json'
 			)
 		)
 	),
@@ -48,7 +48,7 @@ return array(
 			),
 			array(
 				'name' => 'index.php',
-				'type' => 'generated-bootstrap'
+				'type' => 'bootstrap'
 			)
 		)
 	),
@@ -65,16 +65,16 @@ return array(
 						'type' => 'directory'
 					),
 					array(
-						'name' => 'components',
+						'name' => 'sections',
 						'type' => 'directory'
 					),
 					array(
-						'name' => 'components',
+						'name' => 'templates',
 						'type' => 'directory'
 					),
 					array(
 						'name' => 'navigation.json',
-						'type' => 'generated'
+						'type' => 'json'
 					)
 				)
 			)
@@ -82,21 +82,18 @@ return array(
 	),
 	array(
 		'name' => 'composer.json',
-		'type' => 'generated'
+		'type' => 'json'
 	),
 	array(
 		'name' => 'app.php',
-		'type' => 'download',
-		'url' => 'http://sitegear.org/ignition/resources/target/app.php'
+		'type' => 'download'
 	),
 	array(
 		'name' => 'engine.php',
-		'type' => 'download',
-		'url' => 'http://sitegear.org/ignition/resources/target/engine.php'
+		'type' => 'download'
 	),
 	array(
 		'name' => 'cli-config.php',
-		'type' => 'download',
-		'url' => 'http://sitegear.org/ignition/resources/target/cli-config.php'
+		'type' => 'download'
 	)
 );

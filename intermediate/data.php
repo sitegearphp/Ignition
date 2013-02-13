@@ -23,7 +23,9 @@ return array(
 	'composer.json' => array(
 		'require' => array(
 			'sitegear/sitegear' => '*'
-		)
+		),
+		// TODO This is only temporary, it should be added in response to the relevant question
+		'minimum-stability' => 'dev'
 	),
 	/**
 	 * Main configuration file.
