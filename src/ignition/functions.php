@@ -170,6 +170,9 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
 			case 'bootstrap':
 				// TODO buildBootstrap()
 				break;
+			case 'template':
+				// TODO buildTemplate()
+				break;
 		}
 	}
 }
