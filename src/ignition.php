@@ -134,21 +134,6 @@ call_user_func(function() {
 	}
 
 	/**
-	 * Download the specified requirement script into the local cache directory, and return the result of `require`-ing
-	 * the downloaded script.
-	 *
-	 * @param string $requirement Requirement to process.
-	 * @param string $localCacheDir Path to the local cache directory.
-	 *
-	 * @return mixed
-	 */
-	function processRequirement($requirement, $localCacheDir) {
-		$script = sprintf('%s/%s.php', $localCacheDir, $requirement);
-		// TODO Checksum or some other validation on the script for security.
-		return require $script;
-	}
-
-	/**
 	 * Main method.
 	 *
 	 * @throws RuntimeException
@@ -175,7 +160,7 @@ call_user_func(function() {
 			foreach ($requirements as $requirement) {
 				// Create a variable in this function's scope which is assigned the value returned by downloading and
 				// `require`ing the named requirement script.
-				$$requirement = processRequirement($requirement, $localCacheDir);
+				$$requirement = require sprintf('%s/%s.php', $localCacheDir, $requirement);
 			}
 			if (!(isset($questions) && isset($data) && isset($structure))) {
 				// Something is really wrong, one or more of the requirements was downloaded but didn't fulfil its
