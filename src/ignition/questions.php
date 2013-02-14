@@ -143,17 +143,40 @@ return array(
 		)
 	),
 	array(
-		'question' => 'Will you be running on Apache?',
+		'question' => 'Which .htaccess file do you want to use?',
 		'notes' => array(
-			'This will generate a .htaccess file.',
-			'If you are using a different server or select no, additional configuration may be required.'
+			'This is only relevant for Apache web servers.',
+			'If you are using a different server or select None, additional configuration may be required.'
 		),
-		'type' => 'boolean',
-		'default' => 'no',
+		'type' => 'string',
+		'default' => 'recommended',
+		'options' => array(
+			array(
+				'value' => 'none',
+				'label' => 'None'
+			),
+			array(
+				'value' => 'minimal',
+				'label' => 'Minimal required settings'
+			),
+			array(
+				'value' => 'recommended',
+				'label' => 'Recommended settings, use "XSendfile On" in addition to minimal requirements'
+			)
+		),
 		'actions' => array(
 			array(
 				'type' => 'store',
-				'name' => 'generateHtaccess'
+				'name' => 'htaccessFileName'
+			),
+			array(
+				'type' => 'structure',
+				'path' => 'public',
+				'value' => array(
+					'name' => '.htaccess',
+					'type' => 'download',
+					'src' => 'htaccess/%htaccessFileName%'
+				)
 			)
 		)
 	),
@@ -168,7 +191,7 @@ return array(
 		'default' => 'recommended',
 		'options' => array(
 			array(
-				'value' => null,
+				'value' => 'none',
 				'label' => 'None, requires additional work, the site will not work without a front controller'
 			),
 			array(
@@ -197,7 +220,7 @@ return array(
 		'default' => 'recommended',
 		'options' => array(
 			array(
-				'value' => null,
+				'value' => 'none',
 				'label' => 'None, requires further work, the site will not work without a default template'
 			),
 			array(
