@@ -211,6 +211,46 @@ return array(
 		)
 	),
 	array(
+		'question' => 'Which engine bootstrap script do you want to use?',
+		'notes' => array(
+			'The engine bootstrap configures the Sitegear engine and can be customised for your requirements.',
+			'Here you can enable or disable logging via Monolog; if enabled it will also be installed as a dependency.'
+		),
+		'type' => 'string',
+		'default' => 'recommended',
+		'options' => array(
+			array(
+				'value' => 'none',
+				'label' => 'None, requires additional work, the site will not work without an engine bootstrap'
+			),
+			array(
+				'value' => 'minimal',
+				'label' => 'Minimal, don\'t setup logging'
+			),
+			array(
+				'value' => 'recommended',
+				'label' => 'Recommended, use Monolog for logging'
+			)
+		),
+		'actions' => array(
+			array(
+				'type' => 'store',
+				'name' => 'engineBootstrapFileName'
+			),
+			array(
+				'type' => 'data',
+				'if-answer-in' => array(
+					'recommended'
+				),
+				'name' => 'composer.json',
+				'key' => 'require',
+				'value' => array(
+					'monolog/monolog' => '*'
+				)
+			)
+		)
+	),
+	array(
 		'question' => 'Which default page template do you want to include?',
 		'notes' => array(
 			'This forms the basis of all pages within the site by default.',
@@ -308,43 +348,6 @@ return array(
 			)
 		)
 	),
-/** TODO Support this
-	array(
-		'question' => 'Do you want to include and activate Monolog?',
-		'notes' => array(
-			'Monolog is a logging framework which seamlessly integrates with Sitegear when it is available.',
-			'Any PSR-3 compatible logging framework may be used.'
-		),
-		'type' => 'boolean',
-		'default' => 'yes',
-		'dependents' => array(
-			array(
-				'question' => 'What is the filename you wish to record the log messages in?',
-				'notes' => array(
-					'Relative to the site root.'
-				),
-				'type' => 'string',
-				'default' => 'sitegear.log',
-				'actions' => array(
-					array(
-						'type' => 'data',
-						'name' => 'configuration.json',
-						'key' => 'modules.doctrine.connection.dbname'
-					)
-				)
-			),
-			array(
-				'question' => 'What is the minimum logging level you wish to use?',
-				'notes' => array(
-					'Must be a valid logging level: debug, info, alert, notice, warning, error, fatal.',
-					'Specifies the minimum level of log messages that are written to the file.'
-				),
-				'type' => 'string',
-				'default' => 'info'
-			)
-		)
-	),
-**/
 	array(
 		'question' => 'Do you want to add a site user?',
 		'notes' => array(

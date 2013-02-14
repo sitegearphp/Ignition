@@ -110,7 +110,8 @@ return array(
 	),
 	array(
 		'name' => 'engine.php',
-		'type' => 'download'
+		'type' => 'download',
+		'src' => 'engine/%engineBootstrapFileName%.php'
 	),
 	array(
 		'name' => 'cli-config.php',
