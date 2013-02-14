@@ -304,26 +304,4 @@ function composerInstall($target, $localCacheDir, array $additionalArguments=nul
 	passthru(sprintf('php %s/composer.phar install %s', $target, implode(' ', $additionalArguments ?: array())));
 }
 
-/**
- * Recursive directory delete.
- *
- * @param $dir
- *
- * @return bool
- */
-function recursiveRemoveDirectory($dir) {
-	$success = true;
-	foreach (scandir($dir) as $file) {
-		if (!in_array($file, array( '.', '..' ))) {
-			$path = sprintf('%s/%s', $dir, $file);
-			if (is_dir($path)) {
-				$success = recursiveRemoveDirectory($path) && $success;
-			} else {
-				$success = unlink($path) && $success;
-			}
-		}
-	}
-	return rmdir($dir) && $success;
-}
-
 return true;

@@ -53,6 +53,28 @@ call_user_func(function() {
 	}
 
 	/**
+	 * Recursive directory delete.
+	 *
+	 * @param string $dir
+	 *
+	 * @return bool
+	 */
+	function recursiveRemoveDirectory($dir) {
+		$success = true;
+		foreach (scandir($dir) as $file) {
+			if (!in_array($file, array( '.', '..' ))) {
+				$path = sprintf('%s/%s', $dir, $file);
+				if (is_dir($path)) {
+					$success = recursiveRemoveDirectory($path) && $success;
+				} else {
+					$success = unlink($path) && $success;
+				}
+			}
+		}
+		return rmdir($dir) && $success;
+	}
+
+	/**
 	 * Create the basic file system requirements for the ignition script.  That is:
 	 *
 	 *  1. Create the local cache directory if it does not already exist.  If it already exists, but is invalid, then
