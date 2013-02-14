@@ -74,7 +74,6 @@ function askUntilValidAnswer(array $question) {
 	$booleanNegative = array( 'no',  'n', '0', 'false', 'f' );
 	$type = $question['type'];
 	$required = isset($question['required']) && $question['required'];
-
 	// Prompt for an answer until a valid one is given.
 	$answer = null;
 	while (is_null($answer)) {
@@ -83,6 +82,7 @@ function askUntilValidAnswer(array $question) {
 			$response = $question['default'];
 		}
 		if ($type === 'boolean' || $type === 'loop') {
+			// Convert string value to boolean (or loop) value.  A valid true or false value causes the loop to exit.
 			if (in_array($response, $booleanPositive)) {
 				$answer = true;
 			} elseif (in_array($response, $booleanNegative)) {
@@ -93,6 +93,7 @@ function askUntilValidAnswer(array $question) {
 		} elseif ($type === 'string') {
 			$valid = true;
 			if (isset($question['options'])) {
+				// Check the given answer is an available option.
 				$valid = false;
 				foreach ($question['options'] as $option) {
 					$valid = $valid || ($option['value'] === $response);
@@ -103,6 +104,8 @@ function askUntilValidAnswer(array $question) {
 					$response = '';
 				}
 			}
+			// Confirm that the answer was given or not required, as well as being a valid option.  This causes the
+			// loop to exit.
 			if ($valid && (!$required || strlen($response) > 0)) {
 				$answer = $response;
 			}
