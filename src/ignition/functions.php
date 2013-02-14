@@ -170,26 +170,35 @@ function handleAnswer(array $question, $answer, array &$structure, array &$data,
 	$positive = is_string($answer) ? (strlen($answer) > 0) : $answer === true;
 	if ($positive && isset($question['actions']) && is_array($question['actions'])) {
 		foreach ($question['actions'] as $action) {
+			// Get the answer after relevant token replacements, which are specific to this action.
 			$actionAnswer = performTokenReplacements((isset($action['value']) ? $action['value'] : $answer), $values);
-			switch ($action['type']) {
-				case 'data':
-					$name = $action['name'];
-					if (isset($action['key'])) {
-						$key = performTokenReplacements($action['key'], $values);
-						$dataForKey = buildDataForKey($key, $actionAnswer);
-					} else {
-						$dataForKey = array( $actionAnswer );
-					}
-					$data[$name] = array_merge_recursive($data[$name], $dataForKey);
-					break;
-				case 'structure':
-					mergeIntoStructure($structure, $action['path'], $actionAnswer);
-					break;
-				case 'store':
-					$values[$action['name']] = $actionAnswer;
-					break;
-				default:
-					throw new RuntimeException(sprintf('Unknown action type "%s" found for question "%s"', $action['type'], $question['question']));
+			// Check if the action should be performed, based on the answer given.
+			$performAction = isset($action['if-answer-in']) ? in_array($actionAnswer, $action['if-answer-in']) : true;
+			if ($performAction) {
+				switch ($action['type']) {
+					case 'data':
+						// Inject the answer into the data arrays.
+						$name = $action['name'];
+						if (isset($action['key'])) {
+							$key = performTokenReplacements($action['key'], $values);
+							$dataForKey = buildDataForKey($key, $actionAnswer);
+						} else {
+							$dataForKey = array( $actionAnswer );
+						}
+						$data[$name] = array_merge_recursive($data[$name], $dataForKey);
+						break;
+					case 'structure':
+						// Inject the answer into the site structure arrays.
+						mergeIntoStructure($structure, $action['path'], $actionAnswer);
+						break;
+					case 'store':
+						// Store the answer in the values array.
+						$values[$action['name']] = $actionAnswer;
+						break;
+					default:
+						// Action type not recognised, error.
+						throw new RuntimeException(sprintf('Unknown action type "%s" found for question "%s"', $action['type'], $question['question']));
+				}
 			}
 		}
 	}
