@@ -22,7 +22,9 @@ return array(
 	 */
 	'composer.json' => array(
 		'require' => array(
-			'sitegear/sitegear' => '*'
+			'sitegear/sitegear' => '*',
+			// TODO Ability to switch this off (and remove code from engine.php) via questions
+			'monolog/monolog' => '*'
 		),
 		// TODO This is only temporary, it should be added in response to the relevant question
 		'minimum-stability' => 'dev'
