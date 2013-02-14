@@ -48,7 +48,7 @@ method.
 Since the Ignition package is not a dependency, it should not be included through Composer, the dependency manager,
 which is the only reason to put something on Packagist.
 
-## Is it Dodgy?
+## Can it be hot-wired?
 
 You might think that downloading and executing dynamic scripts from a remote server has potential security problems,
 and you are certainly right.  We would never recommend anyone executes scripts that they don't understand or trust.
