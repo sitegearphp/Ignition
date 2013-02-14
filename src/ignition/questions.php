@@ -250,6 +250,7 @@ return array(
 			array(
 				'question' => 'Please enter the database name',
 				'type' => 'string',
+				'required' => true,
 				'actions' => array(
 					array(
 						'type' => 'data',
@@ -261,6 +262,7 @@ return array(
 			array(
 				'question' => 'Please enter the username',
 				'type' => 'string',
+				'required' => true,
 				'actions' => array(
 					array(
 						'type' => 'data',
@@ -272,6 +274,7 @@ return array(
 			array(
 				'question' => 'Please enter the password',
 				'type' => 'string',
+				'required' => true,
 				'actions' => array(
 					array(
 						'type' => 'data',
