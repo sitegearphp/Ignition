@@ -169,7 +169,7 @@ return array(
 		'options' => array(
 			array(
 				'value' => null,
-				'label' => 'None - requires additional work, the site will not work without a front controller'
+				'label' => 'None, requires additional work, the site will not work without a front controller'
 			),
 			array(
 				'value' => 'minimal',
@@ -198,7 +198,7 @@ return array(
 		'options' => array(
 			array(
 				'value' => null,
-				'label' => 'None - requires further work, the site will not work without a default template'
+				'label' => 'None, requires further work, the site will not work without a default template'
 			),
 			array(
 				'value' => 'minimal',
