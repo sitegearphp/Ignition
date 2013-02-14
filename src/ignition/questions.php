@@ -92,7 +92,7 @@ return array(
 			'Email addresses can be added to the configuration file and referred to throughout the site, either for form processing or display purposes.'
 		),
 		'type' => 'loop',
-		'default' => 'no',
+		'default' => 'yes',
 		'dependents' => array(
 			array(
 				'question' => 'Please enter the email address key (e.g. "admin" or "contact")',
