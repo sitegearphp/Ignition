@@ -31,7 +31,7 @@ function askQuestions(array $questions, array &$structure, array &$data, array &
 
 			// Handle the original answer.  This is done after dependents are processed so that answers from dependents
 			// can be used in the replacements performed here.
-			handleAnswer($question, $answer, $data, $values);
+			handleAnswer($question, $answer, $structure, $data, $values);
 
 			// Only go again if this was a 'loop' type question and the answer was positive.
 			$askQuestion = ($question['type'] === 'loop') && $answer;
@@ -97,6 +97,11 @@ function askUntilValidAnswer(array $question) {
 				foreach ($question['options'] as $option) {
 					$valid = $valid || ($option['value'] === $response);
 				}
+				// Special case, allow both default value and override with 'none' (since '' naturally means 'accept
+				// default' so it cannot be used as its own value).
+				if ($response === 'none') {
+					$response = '';
+				}
 			}
 			if ($valid && (!$required || strlen($response) > 0)) {
 				$answer = $response;
@@ -151,30 +156,34 @@ function performTokenReplacements($value, array $values) {
  *
  * @param array $question
  * @param string|boolean $answer
+ * @param array $structure
  * @param array $data
  * @param array $values
  *
  * @throws RuntimeException
  */
-function handleAnswer(array $question, $answer, array &$data, array &$values) {
+function handleAnswer(array $question, $answer, array &$structure, array &$data, array &$values) {
 	// Handle the answer given.
 	$positive = is_string($answer) ? (strlen($answer) > 0) : $answer === true;
 	if ($positive && isset($question['actions']) && is_array($question['actions'])) {
 		foreach ($question['actions'] as $action) {
 			$actionAnswer = performTokenReplacements((isset($action['value']) ? $action['value'] : $answer), $values);
-			$name = $action['name'];
 			switch ($action['type']) {
 				case 'data':
+					$name = $action['name'];
 					if (isset($action['key'])) {
 						$key = performTokenReplacements($action['key'], $values);
-						$dataForKey = buildDataForKey($key, $actionAnswer, $values);
+						$dataForKey = buildDataForKey($key, $actionAnswer);
 					} else {
 						$dataForKey = array( $actionAnswer );
 					}
 					$data[$name] = array_merge_recursive($data[$name], $dataForKey);
 					break;
+				case 'structure':
+					mergeIntoStructure($structure, $action['path'], $actionAnswer);
+					break;
 				case 'store':
-					$values[$name] = $actionAnswer;
+					$values[$action['name']] = $actionAnswer;
 					break;
 				default:
 					throw new RuntimeException(sprintf('Unknown action type "%s" found for question "%s"', $action['type'], $question['question']));
@@ -201,6 +210,29 @@ function buildDataForKey($key, $value) {
 	} else {
 		$k = array_shift($key);
 		return array( $k => buildDataForKey($key, $value) );
+	}
+}
+
+/**
+ * Merge the given value into the `$structure` array hierarchy, using the given path.
+ *
+ * @param array $structure
+ * @param string $path
+ * @param mixed $value
+ */
+function mergeIntoStructure(array &$structure, $path, $value) {
+	$path = explode('/', $path);
+	$name = array_shift($path);
+	foreach ($structure as $index => $entry) {
+		if ($entry['name'] === $name) {
+			if (sizeof($path) === 0) {
+				$structure[$index]['contents'][] = $value;
+			} else {
+				$contents = $entry['contents'];
+				mergeIntoStructure($contents, $path, $value);
+				$structure[$index]['contents'] = $contents;
+			}
+		}
 	}
 }
 
