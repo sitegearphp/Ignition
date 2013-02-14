@@ -197,7 +197,7 @@ return array(
 		'options' => array(
 			array(
 				'value' => null,
-				'label' => 'None (requires further configuration, the site will not work without a default template)'
+				'label' => 'None - requires further configuration, the site will not work without a default template'
 			),
 			array(
 				'value' => 'minimal',
