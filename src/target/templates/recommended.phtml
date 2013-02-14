@@ -29,7 +29,7 @@ echo $view->content()->doctype('html');
 <?php echo $view->userIntegration('element(div)')->authenticationLink(); ?>
 		<address>
 			Your details here.
-			<a href="mailto:<?php echo $view->getEngine()->config('site.administrator.email'); ?>"><?php echo $view->getEngine()->config('site.administrator.name'); ?></a>
+			Contact: <a href="mailto:<?php echo $view->getEngine()->config('site.administrator.email'); ?>"><?php echo $view->getEngine()->config('site.administrator.name'); ?></a>
 		</address>
 	</footer>
 <?php echo $view->resources()->script(); ?>
