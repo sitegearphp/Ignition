@@ -86,7 +86,8 @@ return array(
 						'contents' => array(
 							array(
 								'name' => 'default.phtml',
-								'type' => 'template'
+								'type' => 'download',
+								'src' => 'templates/%templateFileName%.phtml'
 							)
 						)
 					),

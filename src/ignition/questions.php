@@ -187,49 +187,66 @@ return array(
 		)
 	),
 	array(
-		'question' => 'Do you want to use XML style markup?',
+		'question' => 'Which default page template do you want to include?',
 		'notes' => array(
-			'If you don\'t know what this is, select "no".'
+			'This forms the basis of all pages within the site by default.',
+			'Any number of templates can be added later, meaning different URLs (or URL pattern matches) can be presented using different page layouts or styles.'
 		),
-		'type' => 'boolean',
-		'default' => 'no',
+		'type' => 'string',
+		'default' => 'recommended',
+		'options' => array(
+			array(
+				'value' => null,
+				'label' => 'None (requires further configuration, the site will not work without a default template)'
+			),
+			array(
+				'value' => 'minimal',
+				'label' => 'Minimal HTML5 template'
+			),
+			array(
+				'value' => 'minimal-xml',
+				'label' => 'Minimal HTML5 template with XML style'
+			),
+			array(
+				'value' => 'recommended',
+				'label' => 'Recommended HTML5 starting point'
+			),
+			array(
+				'value' => 'recommended-xml',
+				'label' => 'Recommended HTML5 starting point with XML style'
+			)
+		),
 		'actions' => array(
 			array(
 				'type' => 'store',
-				'name' => 'useXml'
+				'name' => 'templateFileName'
 			)
 		)
 	),
-/** TODO Support this
-	array(
-		'question' => 'Do you want to include HTML5 boilerplate?',
-		'notes' => array(
-			'HTML5 boilerplate provides a useful starting point for your HTML5 page templates.'
-		),
-		'type' => 'boolean',
-		'default' => 'yes',
-		'dependents' => array(
-			array(
-				'question' => 'Do you want to include the IE-specific html element classes?',
-				'notes' => array(
-					'This is an optional feature of HTML5 boilerplate which provides version-specific classes on the root (html) element.',
-				),
-				'type' => 'boolean',
-				'default' => 'no'
-			)
-		)
-	),
-**/
+	// TODO Actually build the database instance (?)
 	array(
 		'question' => 'Do you need a database?',
 		'notes' => array(
 			'Any database type supported by Doctrine is supported by Sitegear',
-			'Currently only MySQL is supported by the Sitegear Ignition script',
-			'This option must be selected if you are using any modules that require Doctrine module, otherwise additional configuration is required'
+			'This option must be selected if you are using any modules that require Doctrine module, otherwise additional configuration is required',
+			'This does not actually build the database, this should be done through tools such as phpMyAdmin'
 		),
 		'type' => 'boolean',
 		'default' => 'no',
 		'dependents' => array(
+			array(
+				'question' => 'Please enter the database driver type',
+				'type' => 'string',
+				'default' => 'pdo_mysql',
+				'required' => true,
+				'actions' => array(
+					array(
+						'type' => 'data',
+						'name' => 'configuration.json',
+						'key' => 'modules.doctrine.connection.driver'
+					)
+				)
+			),
 			array(
 				'question' => 'Please enter the database name',
 				'type' => 'string',
@@ -262,14 +279,6 @@ return array(
 						'key' => 'modules.doctrine.connection.password'
 					)
 				)
-			)
-		),
-		'actions' => array(
-			array(
-				'type' => 'data',
-				'name' => 'configuration.json',
-				'key' => 'modules.doctrine.connection.driver',
-				'value' => 'pdo_mysql'
 			)
 		)
 	),
