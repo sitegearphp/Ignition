@@ -156,7 +156,8 @@ call_user_func(function() {
 				$$requirement = processRequirement($requirement, $localCacheDir);
 			}
 			if (!(isset($questions) && isset($data) && isset($structure))) {
-				// Something is really wrong, one or more of the requirements was downloaded but didn't fulfil its interface.
+				// Something is really wrong, one or more of the requirements was downloaded but didn't fulfil its
+				// interface.
 				throw new RuntimeException('Requirements unfulfilled.');
 			}
 			output('Requirements fulfilled, ready to proceed with ignition', 'success');
