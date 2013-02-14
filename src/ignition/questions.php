@@ -355,7 +355,7 @@ return array(
 			'At least one user must be created for access to the content management tools without further configuration.'
 		),
 		'type' => 'loop',
-		'default' => 'no',
+		'default' => 'yes',
 		'dependents' => array(
 			array(
 				'question' => 'Please enter the user\'s email address (username)',
