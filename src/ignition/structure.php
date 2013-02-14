@@ -48,7 +48,8 @@ return array(
 			),
 			array(
 				'name' => 'index.php',
-				'type' => 'bootstrap'
+				'type' => 'download',
+				'src' => 'front-controllers/%frontControllerFileName%.php'
 			)
 		)
 	),

@@ -253,9 +253,6 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
 					throw new RuntimeException(sprintf('Could not create JSON file "%s" from data at key "%s"', $path, $name));
 				}
 				break;
-			case 'bootstrap':
-				// TODO buildBootstrap()
-				break;
 		}
 	}
 }
