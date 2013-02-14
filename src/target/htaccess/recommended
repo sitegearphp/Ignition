@@ -1,0 +1,5 @@
+# Redirect all requests to Sitegear front controller, with XSendfile enabled and MultiViews disabled
+Options -MultiViews
+XSendFile On
+RewriteEngine On
+RewriteRule ^.*$ index.php [NC,L]
