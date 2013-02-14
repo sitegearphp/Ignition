@@ -223,13 +223,12 @@ return array(
 			)
 		)
 	),
-	// TODO Actually build the database instance (?)
 	array(
 		'question' => 'Do you need a database?',
 		'notes' => array(
 			'Any database type supported by Doctrine is supported by Sitegear',
 			'This option must be selected if you are using any modules that require Doctrine module, otherwise additional configuration is required',
-			'This does not actually build the database, this should be done through tools such as phpMyAdmin'
+			'This does not create the database instance or user, this should be done through tools such as phpMyAdmin'
 		),
 		'type' => 'boolean',
 		'default' => 'no',
