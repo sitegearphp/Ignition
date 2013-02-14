@@ -46,7 +46,7 @@ return array(
 	 */
 	'navigation.json' => array(
 		array(
-			'url' => '',
+			'url' => ' ',
 			'label' => 'Home',
 			'tooltip' => 'Return to the home page'
 		)

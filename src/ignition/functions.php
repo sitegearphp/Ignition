@@ -283,7 +283,7 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
 				break;
 			case 'json':
 				$jsonOptions = defined('JSON_PRETTY_PRINT') && defined('JSON_UNESCAPED_SLASHES') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0;
-				$jsonData = json_encode(filterEmptyValues($data[$name]), $jsonOptions) . PHP_EOL;
+				$jsonData = json_encode(normaliseData($data[$name]), $jsonOptions) . PHP_EOL;
 				if (file_put_contents($path, $jsonData) === false) {
 					throw new RuntimeException(sprintf('Could not create JSON file "%s" from data at key "%s"', $path, $name));
 				}
@@ -296,17 +296,24 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
  * Remove empty values from the given data array (recursively).  This includes empty strings and arrays that are empty
  * or consist only of other empty values.
  *
+ * Also trims all excessive whitespace from all values.
+ *
+ * To specify a value that is actually empty, use a string consisting of only whitespace, e.g. `' '`.
+ *
  * @param array $data Data to filter.
  *
  * @return array Filtered data.
  */
-function filterEmptyValues(array $data) {
+function normaliseData(array $data) {
 	foreach ($data as $key => $value) {
 		if (is_array($value)) {
-			$data[$key] = $value = filterEmptyValues($value);
+			$data[$key] = $value = normaliseData($value);
 		}
 		if (empty($value)) {
 			unset($data[$key]);
+		}
+		if (is_string($value)) {
+			$data[$key] = trim($value);
 		}
 	}
 	return $data;
