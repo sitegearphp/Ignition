@@ -26,11 +26,9 @@ function askQuestions(array $questions, array &$structure, array &$data, array &
 	foreach ($questions as $question) {
 		$askQuestion = true;
 		while ($askQuestion) {
-			// Q and A
+			// Q and A, this question and then dependents.
 			writeQuestionText($question);
 			$answer = askUntilValidAnswer($question);
-
-			// Process dependents.
 			if ($answer && isset($question['dependents']) && is_array($question['dependents'])) {
 				askQuestions($question['dependents'], $structure, $data, $values);
 			}
@@ -43,6 +41,9 @@ function askQuestions(array $questions, array &$structure, array &$data, array &
 			$askQuestion = ($question['type'] === 'loop') && $answer;
 		}
 	}
+	// This is a convenient place to perform token replacements in the `$structure` values, while we have the `$values`
+	// array handily in-scope
+	$structure = performTokenReplacements($structure, $values);
 }
 
 /**
@@ -53,7 +54,14 @@ function askQuestions(array $questions, array &$structure, array &$data, array &
 function writeQuestionText(array $question) {
 	output(PHP_EOL . $question['question'], 'success');
 	if (isset($question['notes'])) {
+		output('Notes:', 'info');
 		output(' * ' . implode(PHP_EOL . ' * ', $question['notes']), 'info');
+	}
+	if (isset($question['options'])) {
+		output('Options:', 'info');
+		foreach ($question['options'] as $option) {
+			output(sprintf(' * %s (%s)', $option['value'], $option['label']), 'info');
+		}
 	}
 }
 
@@ -90,7 +98,14 @@ function askUntilValidAnswer(array $question) {
 				output(sprintf('You must answer either positively (%s) or negatively (%s)', implode(',', $booleanPositive), implode(',', $booleanNegative)), 'error');
 			}
 		} elseif ($type === 'string') {
-			if (!$required || strlen($response) > 0) {
+			$valid = true;
+			if (isset($question['options'])) {
+				$valid = false;
+				foreach ($question['options'] as $option) {
+					$valid = $valid || ($option['value'] === $response);
+				}
+			}
+			if ($valid && (!$required || strlen($response) > 0)) {
 				$answer = $response;
 			}
 		} else {
@@ -125,7 +140,6 @@ function getHint(array $question) {
  * @return mixed
  */
 function performTokenReplacements($value, array $values) {
-	output(sprintf('Performing token replacements on %s', is_array($value) ? 'array value' : $value), 'info');
 	if (is_array($value)) {
 		foreach ($value as $k => $v) {
 			$value[$k] = performTokenReplacements($v, $values);
@@ -134,7 +148,7 @@ function performTokenReplacements($value, array $values) {
 		foreach ($values as $k => $v) {
 			$value = preg_replace(sprintf('/%%%s%%/', $k), $v, $value);
 		}
-	}
+	} // else return unmodified; forward compatibility
 	return $value;
 }
 
@@ -150,7 +164,6 @@ function performTokenReplacements($value, array $values) {
  */
 function handleAnswer(array $question, $answer, array &$data, array &$values) {
 	// Handle the answer given.
-	output(sprintf('Answered "%s" to "%s"', is_string($answer) ? $answer : ($answer ? 'true' : 'false'), $question['question']));
 	$positive = is_string($answer) ? (strlen($answer) > 0) : $answer === true;
 	if ($positive && isset($question['actions']) && is_array($question['actions'])) {
 		foreach ($question['actions'] as $action) {
@@ -164,7 +177,6 @@ function handleAnswer(array $question, $answer, array &$data, array &$values) {
 					} else {
 						$dataForKey = array( $actionAnswer );
 					}
-
 					$data[$name] = array_merge_recursive($data[$name], $dataForKey);
 					break;
 				case 'store':
@@ -235,7 +247,7 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
 				}
 				break;
 			case 'download':
-				$source = sprintf('%s/%s', $downloadRootUrl, $name);
+				$source = sprintf('%s/%s', $downloadRootUrl, isset($entry['src']) ? $entry['src'] : $name);
 				if (!copy($source, $path)) {
 					throw new RuntimeException(sprintf('Could not download required resource from "%s" to "%s"', $source, $path));
 				}
@@ -248,9 +260,6 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
 				break;
 			case 'bootstrap':
 				// TODO buildBootstrap()
-				break;
-			case 'template':
-				// TODO buildTemplate()
 				break;
 		}
 	}
