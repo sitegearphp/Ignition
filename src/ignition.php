@@ -185,9 +185,11 @@ call_user_func(function() {
 			output('Requirements fulfilled, ready to proceed with ignition', 'success');
 			// Main processing sequence.
 			// 1. Ask questions.
-			askQuestions($questions, $structure, $data);
+			$values = array();
+			askQuestions($questions, $structure, $data, $values);
 			output('All responses accepted', 'success');
 			// 2. Build the file system structure in the staging area.
+			$structure = performTokenReplacements($structure, $values);
 			buildStructure($structure, $data, $localStagingDir, $targetResourcesRootUrl);
 			output('Website structure built in staging area', 'success');
 			// 3. Move the file system contents into the target directory.

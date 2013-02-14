@@ -18,11 +18,7 @@
  *
  * @throws RuntimeException
  */
-function askQuestions(array $questions, array &$structure, array &$data, array &$values=null) {
-	if (is_null($values)) {
-		// This is the first call, so create a new $values array.  Recursive calls pass this back through.
-		$values = array();
-	}
+function askQuestions(array $questions, array &$structure, array &$data, array &$values) {
 	foreach ($questions as $question) {
 		$askQuestion = true;
 		while ($askQuestion) {
@@ -41,9 +37,6 @@ function askQuestions(array $questions, array &$structure, array &$data, array &
 			$askQuestion = ($question['type'] === 'loop') && $answer;
 		}
 	}
-	// This is a convenient place to perform token replacements in the `$structure` values, while we have the `$values`
-	// array handily in-scope
-	$structure = performTokenReplacements($structure, $values);
 }
 
 /**
@@ -132,7 +125,7 @@ function getHint(array $question) {
 /**
  * Perform token replacements on the given text value, using the `$values` map for tokens.  Any token in the text like
  * `%token%` where "token" is any key in the `$values` array will be replaced by the corresponding value from the
- * `$values` array.  Tokens with no matching key in `$values` will not be replaced.
+ * `$values` array.  Tokens with no matching key in `$values` will be replaced by an empty string.
  *
  * @param mixed $value
  * @param array $values
@@ -148,6 +141,7 @@ function performTokenReplacements($value, array $values) {
 		foreach ($values as $k => $v) {
 			$value = preg_replace(sprintf('/%%%s%%/', $k), $v, $value);
 		}
+		$value = preg_replace('/%.+?%/', '', $value);
 	} // else return unmodified; forward compatibility
 	return $value;
 }
@@ -254,7 +248,8 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
 				break;
 			case 'json':
 				$jsonOptions = defined('JSON_PRETTY_PRINT') && defined('JSON_UNESCAPED_SLASHES') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0;
-				if (file_put_contents($path, json_encode($data[$name], $jsonOptions)) === false) {
+				$jsonData = json_encode(filterEmptyValues($data[$name]), $jsonOptions) . PHP_EOL;
+				if (file_put_contents($path, $jsonData) === false) {
 					throw new RuntimeException(sprintf('Could not create JSON file "%s" from data at key "%s"', $path, $name));
 				}
 				break;
@@ -263,6 +258,26 @@ function buildStructure(array $structure, array $data, $rootDir, $downloadRootUr
 				break;
 		}
 	}
+}
+
+/**
+ * Remove empty values from the given data array (recursively).  This includes empty strings and arrays that are empty
+ * or consist only of other empty values.
+ *
+ * @param array $data Data to filter.
+ *
+ * @return array Filtered data.
+ */
+function filterEmptyValues(array $data) {
+	foreach ($data as $key => $value) {
+		if (is_array($value)) {
+			$data[$key] = $value = filterEmptyValues($value);
+		}
+		if (empty($value)) {
+			unset($data[$key]);
+		}
+	}
+	return $data;
 }
 
 /**
