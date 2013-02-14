@@ -1,0 +1,39 @@
+<?php
+/** @var \Sitegear\Core\View\View $view */
+$view->getStringsManager()->prepend('title', 'Your Site\'s Persistent Title Text Here');
+$view->getStringsManager()->append('keywords', 'As', 'Many', 'Keywords', 'As You Like');
+echo $view->content()->doctype('html', true);
+?>
+<html>
+<head>
+<?php echo $view->strings('inline-element(title)')->title(); ?>
+<?php echo $view->content()->baseLinks(); ?>
+<?php echo $view->resources()->styles(); ?>
+<?php echo $view->content()->metadata(); ?>
+</head>
+<body class="<?php echo $view->content()->bodyClasses(); ?>">
+	<header>
+		<a href=""><img src="<?php echo $view->getEngine()->config('site.logo-url') ?>" /></a>
+	</header>
+	<nav>
+		<?php echo $view->navigation()->navigation(); ?>
+	</nav>
+	<article>
+<?php echo $view->navigation('element(p,id="breadcrumbs")')->breadcrumbs(); ?>
+<?php echo $view->section('editable')->main(); ?>
+	</article>
+	<aside>
+<?php echo $view->section('editable')->sidebar(); ?>
+	</aside>
+	<footer>
+<?php echo $view->userIntegration('element(div)')->authenticationLink(); ?>
+		<address>
+			Your details here.
+			<a href="mailto:<?php echo $view->getEngine()->config('site.administrator.email'); ?>"><?php echo $view->getEngine()->config('site.administrator.name'); ?></a>
+		</address>
+	</footer>
+<?php echo $view->resources()->script(); ?>
+<?php echo $view->section()->script(); ?>
+<?php echo $view->google()->analytics(); ?>
+</body>
+</html>

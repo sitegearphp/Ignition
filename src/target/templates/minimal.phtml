@@ -1,0 +1,13 @@
+<?php
+/** @var \Sitegear\Core\View\View $view */
+echo $view->content()->doctype('html');
+?>
+<html>
+<head>
+<?php echo $view->content()->baseLinks(); ?>
+<?php echo $view->content()->metadata(); ?>
+</head>
+<body class="<?php echo $view->content()->bodyClasses(); ?>">
+<?php echo $view->section('editable', 'comments')->main(); ?>
+</body>
+</html>
