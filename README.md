@@ -47,3 +47,16 @@ method.
 
 Since the Ignition package is not a dependency, it should not be included through Composer, the dependency manager,
 which is the only reason to put something on Packagist.
+
+## Is it Dodgy?
+
+You might think that downloading and executing dynamic scripts from a remote server has potential security problems,
+and you are certainly right.  We would never recommend anyone executes scripts that they don't understand or trust.
+
+The entire (small!) codebase of Sitegear Ignition is available, both here and from the canonical source server at:
+http://sitegear.org/ignition/resources/.
+
+If you are concerned about any side effects the Sitegear Ignition script might have, please read and understand the
+code thoroughly.
+
+If you find anything that concerns you, please contact us: admin@sitegear.org
