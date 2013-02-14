@@ -322,7 +322,7 @@ return array(
 	),
 **/
 	array(
-		'question' => 'Do you want to add a user?',
+		'question' => 'Do you want to add a site user?',
 		'notes' => array(
 			'Users created here will have full administration privileges',
 			'At least one user must be created for access to the content management tools without further configuration.'
