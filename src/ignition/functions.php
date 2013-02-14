@@ -173,7 +173,7 @@ function handleAnswer(array $question, $answer, array &$structure, array &$data,
 			// Get the answer after relevant token replacements, which are specific to this action.
 			$actionAnswer = performTokenReplacements((isset($action['value']) ? $action['value'] : $answer), $values);
 			// Check if the action should be performed, based on the answer given.
-			$performAction = isset($action['if-answer-in']) ? in_array($actionAnswer, $action['if-answer-in']) : true;
+			$performAction = !isset($action['if-answer-in']) || in_array($answer, $action['if-answer-in']);
 			if ($performAction) {
 				switch ($action['type']) {
 					case 'data':
