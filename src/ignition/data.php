@@ -17,28 +17,34 @@
  * This structure is augmented programmatically depending on user selection and input.
  */
 return array(
+
 	/**
 	 * Composer configuration.  This is what brings in all the dependencies including Sitegear itself.
 	 */
 	'composer.json' => array(
 		'require' => array(
-			'sitegear/sitegear' => '*'
+			'sitegear/sitegear' => '*',
+			'sitegear/vendor-resources' => '*'
 		),
 		// TODO This is only temporary, it should be added in response to the relevant question
 		'minimum-stability' => 'dev'
 	),
+
 	/**
 	 * Main configuration file.
 	 */
 	'configuration.json' => array(),
+
 	/**
 	 * Development configuration overrides file.
 	 */
 	'configuration.development.json' => array(),
+
 	/**
 	 * User data file (authentication and access control).
 	 */
 	'users.json' => array(),
+
 	/**
 	 * Navigation data file (for generation of site navigation, breadcrumbs, sitemaps, etc).
 	 */
