@@ -11,6 +11,7 @@ return call_user_func(function() {
 	$streamHandler = new \Monolog\Handler\StreamHandler(__DIR__ . '/sitegear.log', \Monolog\Logger::INFO);
 	$streamHandler->setFormatter(new \Monolog\Formatter\LineFormatter("[%datetime%] [%channel%] [%level_name%] %message% %context%\n"));
 	$logger->pushHandler($streamHandler);
+	$logger->pushProcessor(new \Monolog\Processor\PsrLogMessageProcessor());
 	\Sitegear\Util\LoggerRegistry::getInstance()->register($logger);
 
 	/**
