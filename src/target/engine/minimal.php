@@ -14,7 +14,7 @@ return call_user_func(function() {
 	 * Create and return the engine object.  There are many default implementations being used here that can be
 	 * overridden using constructor-based dependency injection.  See the API documentation for details.
 	 */
-	$engine = new \Sitegear\Core\Engine\Engine(__DIR__, $environment);
+	$engine = new \Sitegear\Engine\SitegearEngine(__DIR__, $environment);
 	return $engine->configure($config);
 
 });

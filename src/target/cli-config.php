@@ -7,7 +7,7 @@ $helperSet = call_user_func(function() {
 
 	/**
 	 * Create the engine object using lower level bootstrap.
-	 * @var \Sitegear\Core\Engine\Engine $engine
+	 * @var \Sitegear\Engine\SitegearEngine $engine
 	 */
 	$engine = require 'engine.php';
 

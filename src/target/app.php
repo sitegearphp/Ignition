@@ -6,7 +6,7 @@ return call_user_func(function() {
 
 	/**
 	 * Create the engine object using lower level bootstrap.
-	 * @var \Sitegear\Core\Engine\Engine $engine
+	 * @var \Sitegear\Engine\SitegearEngine $engine
 	 */
 	$engine = require 'engine.php';
 
@@ -22,7 +22,7 @@ return call_user_func(function() {
 	/**
 	 * Create Sitegear controller resolver.
 	 */
-	$resolver = new \Sitegear\Core\Engine\EngineControllerResolver($engine);
+	$resolver = new \Sitegear\Engine\Controller\SitegearControllerResolver($engine);
 
 	/**
 	 * Create and return the application object, which is simply a Symfony HttpKernel instance.
