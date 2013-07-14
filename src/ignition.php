@@ -141,7 +141,6 @@ call_user_func(function() {
 	function install() {
 		// Initalise.
 		output(PHP_EOL . 'Sitegear Ignition' . PHP_EOL, 'success');
-		$exception = null;
 		$ignitionResourcesRootUrl = 'http://sitegear.org/ignition/resources/ignition';
 		$targetResourcesRootUrl = 'http://sitegear.org/ignition/resources/target';
 		$localCacheDir = __DIR__ . '/.ignition-cache';
@@ -183,22 +182,19 @@ call_user_func(function() {
 			// 4. Process dependencies.
 			composerInstall(__DIR__, $localCacheDir, $composerArguments);
 			output('Website and dependencies successfully deployed', 'success');
-		} catch (Exception $e) {
-			// Save the exception to throw later, after we've cleaned up.
-			output('An error has occurred: ', $e->getMessage(), 'error');
-			$exception = $e;
-		}
-		// Cleanup file system.
-		output('Cleaning up file system; removing local resources cache... ', 'info');
-		if (!recursiveRemoveDirectory($localCacheDir)) {
-			// Falter at the finishing line.
-			output(sprintf('An error occurred removing local cache directory "%s".  Everything else is fine.  The directory may be removed manually.', $localCacheDir), 'error');
-		} elseif (!is_null($exception)) {
-			// Report previously-caught exception during main processing.
-			throw $exception;
-		} else {
-			// Success!  Sign-off message.
+			// Cleanup file system.
+			if (file_exists($localCacheDir)) {
+				output('Cleaning up file system; removing local resources cache... ', 'info');
+				if (!recursiveRemoveDirectory($localCacheDir)) {
+					// Falter at the finishing line.
+					throw new RuntimeException(sprintf('An error occurred removing local cache directory "%s".  The directory may be removed manually.', $localCacheDir));
+				}
+			}
 			output(PHP_EOL . 'Sitegear Ignition is done.  Your site is ready to design and populate.' . PHP_EOL, 'success');
+		} catch (Exception $e) {
+			// Output the error message and rethrow the exception.
+			output('An error has occurred: ' . $e->getMessage(), 'error');
+			throw $e;
 		}
 	}
 
