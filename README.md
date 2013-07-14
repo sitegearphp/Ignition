@@ -1,10 +1,10 @@
 # Sitegear Ignition
 
-The Sitegear Ignition package is used to generate the necessary boilerplate for a Sitegear website.
+The Sitegear Ignition package is used to generate the necessary boilerplate for a <a href="https://github.com/sitegear/Sitegear">Sitegear</a> website.
 
 This is a "turn-key" solution for creating a website using Sitegear (pun intended).
 
-**NOTE** This is a work in progress.  At the moment you should expect _nothing_ to work!
+**NOTE** This is a work in progress.  It is functional but not yet complete.
 
 ## Distribution
 
@@ -57,6 +57,7 @@ The entire (small!) codebase of Sitegear Ignition is available, both here and fr
 http://sitegear.org/ignition/resources/.
 
 If you are concerned about any side effects the Sitegear Ignition script might have, please read and understand the
-code thoroughly.
+code thoroughly, or alternatively you can always use Sitegear in the more traditional manner, by manually building your
+project structure and `composer.json` file contents.
 
 If you find anything that concerns you, please contact us: admin@sitegear.org
